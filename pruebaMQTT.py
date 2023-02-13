@@ -6,9 +6,8 @@ import requests
 
 broker = 'broker.emqx.io'
 port = 1883
-# topic = "python/mqtt"
-#client_id = 'python-mqtt-666asfdzdssdfsd'
-client_id = f'buenaventura-mqtt-{random.randint(0, 10000)}'
+client_id = f'buenaventura-mqtt-a-{random.randint(0, 10000)}'
+print("CLIENTE: ",client_id)
 username = 'emqx'
 password = 'public'
 
@@ -25,50 +24,35 @@ def connect_mqtt():
 	client.connect(broker, port)
 	return client
 
-
-def Vehiculo():
-	def __init__(self, nombre: str):
-		self.name = nombre
-
-	
-
 def subscribe(client: mqtt_client, topic: str):
 	client.subscribe(topic)
 	client.on_message = on_message
 
-estado = []
-timestamp = []
 def on_message(client, userdata, msg):
-	print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
-	resultado=''
-	topic_arr = msg.topic.split('/')
-	name = topic_arr[1]
-	print(name)
-	if topic_arr[2] == "conectado":
-		if msg.payload.decode() == "Y":
-			return
-		if msg.payload.decode() == "N":
-			resultado = '-'
-			estado.append('-')
-	if topic_arr[2] == "encendido":
-		resultado = str(msg.payload.decode())
-		resultado_arr = resultado.split(',') 
-		estado.append(resultado_arr[1])
-		timestamp.append(resultado_arr[0])
-
-		print(estado,timestamp)
-		# res = requests.get(f'http://localhost:8000/iotVehiculos/registrarDatos?mensaje={resultado}&tiempo={datetime.datetime.now().strftime("%d-%m-%Y:%H-%M-%S")}')
-		res = requests.get(f'http://localhost:80/iotVehiculos/registrarDatos?mensaje={resultado_arr[1]}&tiempo={resultado_arr[0]}')
-		print(res)
+	try:
+		print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
+		resultado=''
+		topic_arr = msg.topic.split('/')
+		# name = topic_arr[1]
+		if topic_arr[2] == "encendido":
+			resultado = str(msg.payload.decode())
+			resultado_arr = resultado.split(',') 
+			estado = resultado_arr[1]
+			timestamp = resultado_arr[0]
+			res = requests.get(f'http://localhost:8000/iotVehiculos/registrarDatos?mensaje={estado}&tiempo={timestamp}')
+			print(res)
+	except:
+		print("ERROR")
 
 
 
 if __name__ == '__main__':
 	client = connect_mqtt()
+	time.sleep(1)
 	client.loop_start()
 
-	subscribe(client, "vehiculos/+/encendido")
-	subscribe(client, "vehiculos/+/conectado")
+	subscribe(client, "testing/+/encendido")
+	subscribe(client, "testing/+/conectado")
 	while True:
 		time.sleep(1)
 
