@@ -7,6 +7,10 @@ document.addEventListener('DOMContentLoaded',()=>{
                     grid:{
                         display: false,
                     },
+                    type: 'time',
+                    time: {
+                        unit: 'minute'
+                    }
                 },
                 y:{
                     max:1.5,
@@ -39,7 +43,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     })
 
     setInterval(()=>{
-        fetch('/iotVehiculos/enviarDatos?cantidad=20')
+        fetch('/iotVehiculos/enviarDatos?cantidad=40')
         .then(response=>response.json())
         .then(data => {
             console.log(data)
